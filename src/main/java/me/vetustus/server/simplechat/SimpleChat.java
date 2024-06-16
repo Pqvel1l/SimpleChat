@@ -22,10 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.io.BufferedReader;
 
 import static me.vetustus.server.simplechat.ChatColor.translateChatColors;
@@ -34,12 +34,17 @@ public class SimpleChat implements ModInitializer {
     public ChatConfig config;
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static class ChatUtils {
+        public static String stripColorCodes(String message) {
+            return message.replaceAll("(?i)<c:#([0-9a-fA-F]{6})>|<white>|<gray>|</gray>", "");
+        }
+    }
+
     @Override
     public void onInitialize() {
-
         try {
             loadConfig();
-	    LOGGER.info("The config is saved!");
+            LOGGER.info("The config is saved!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,7 +133,6 @@ public class SimpleChat implements ModInitializer {
                 player.sendMessage(noPlayerNearbyTextResult, config.noPlayerNearbyActionBar());
             }
 
-            // Убедитесь, что логируется только одно сообщение
             LOGGER.info(ChatUtils.stripColorCodes(stringMessage));
             return chatMessage;
         });
@@ -150,11 +154,6 @@ public class SimpleChat implements ModInitializer {
                     return 1;
                 })));
     }
-    public class ChatUtils {
-        public static String stripColorCodes(String message) {
-            return message.replaceAll("(?i)<c:#([0-9a-fA-F]{6})>|<white>|<gray>|</gray>", "");
-        }
-    }
 
     private void loadConfig() throws IOException {
         File configFile = new File(ChatConfig.CONFIG_PATH);
@@ -173,9 +172,6 @@ public class SimpleChat implements ModInitializer {
             e.printStackTrace();
         }
     }
-
-
-
 
     private Text literal(String text) {
         return Text.literal(text);
